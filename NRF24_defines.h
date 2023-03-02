@@ -6,13 +6,34 @@
  * This file contains defines e.g. register map address and platform spesific configurations
  */
 
-#define NRF24_SPI_SPEED = 100000
+#define NRF_SPI_SCK_F 10000000 // 10 MHz
 
 // SPI CSN
 #define HIGH 0x1
 #define LOW  0x0
 
-// Memory map
+// PRX & TRX modes
+#define RX 0x1 
+#define TX 0x0
+
+// RF datarates
+#define NRF24_1MBPS     0x0
+#define NRF24_2MBPS     0x1
+#define NRF24_250KBPS   0x2
+
+// Power amplifier levels
+// LOW = -18dbm, MED = -12dBm, HIGH = -6dBm, MAX = 0dBm
+#define NRF24_PA_LOW    0x0
+#define NRF24_PA_MED    0x1
+#define NRF24_PA_HIGH   0x2
+#define NRF24_PA_MAX    0x3
+
+// CRC length
+#define NRF24_CRC_DISABLE   0x0
+#define NRF24_CRC_8         0x1
+#define NRF24_CRC_16        0x2
+
+// Memory map addresses
 #define NRF_CONFIG  0x00
 #define EN_AA       0x01
 #define EN_RXADDR   0x02
@@ -40,6 +61,11 @@
 #define DYNPD       0x1C
 #define FEATURE     0x1D
 
+// Bit mnemonics
+#define RX_DR   0x6
+#define TX_DS   0x5
+#define MAX_RT  0x4
+
 // SPI CMD
 #define R_REGISTER          0x00
 #define W_REGISTER          0x20
@@ -53,12 +79,5 @@
 #define W_TX_PAYLOAD_NO_ACK 0xB0
 #define NOP                 0xFF
 #define REG_MASK            0x1F // Register mask for write and read commands (xxxA AAAA)
-
-// RF output power in TX mode
-#define MIN     0x00 //-18dBm
-#define MEDIUM  0x01 //-12dBm   
-#define HI      0x02 //-6dBm   
-#define MAX     0x03 //-0dBm
-
 
 #endif // NRF24_DEFINES_H
