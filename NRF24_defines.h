@@ -8,30 +8,15 @@
 
 #define NRF_SPI_SCK_F 10000000 // 10 MHz
 
-// SPI CSN
-#define HIGH 0x1
-#define LOW  0x0
-
-// PRX & TRX modes
-#define RX 0x1 
-#define TX 0x0
-
-// RF datarates
-#define NRF24_1MBPS     0x0
-#define NRF24_2MBPS     0x1
-#define NRF24_250KBPS   0x2
-
 // Power amplifier levels
-// LOW = -18dbm, MED = -12dBm, HIGH = -6dBm, MAX = 0dBm
-#define NRF24_PA_LOW    0x0
-#define NRF24_PA_MED    0x1
-#define NRF24_PA_HIGH   0x2
-#define NRF24_PA_MAX    0x3
+#define  PA_LOW     0x0 // -18dBm     
+#define  PA_MED     0x1 // -12dBm 
+#define  PA_HIGH    0x2 // -6dBm
+#define  PA_MAX     0x3 // 0dBm
 
-// CRC length
-#define NRF24_CRC_DISABLE   0x0
-#define NRF24_CRC_8         0x1
-#define NRF24_CRC_16        0x2
+// Datarates
+#define DATARATE_MED    0x0 // 1Mbps
+#define DATARATE_HIGH   0x1 // 2MBPS
 
 // Memory map addresses
 #define NRF_CONFIG  0x00
@@ -41,7 +26,7 @@
 #define SETUP_RETR  0x04
 #define RF_CH       0x05
 #define RF_SETUP    0x06
-#define STATUS      0x07
+#define NRF_STATUS  0x07
 #define OBSERVE_TX  0x08
 #define RPD         0x09
 #define RX_ADDR_P0  0x0A
@@ -61,10 +46,29 @@
 #define DYNPD       0x1C
 #define FEATURE     0x1D
 
-// Bit mnemonics
+/******************
+ * Bit mnemonics 
+*******************/
+// NRF_CONFIG
+#define MASK_RX_DR  0x6
+#define MASK_TX_DS  0x5
+#define MASK_MAX_RT 0x4
+#define EN_CRC      0x3
+#define CRCO        0x2
+#define PWR_UP      0x1
+#define PRIM_RX     0x0
+
+#define CONFIG_RST_STATE 0x08
+
+// RF_SETUP
+#define RF_PWR  0x1
+
+// STATUS
 #define RX_DR   0x6
 #define TX_DS   0x5
 #define MAX_RT  0x4
+#define RX_P_NO 0x1 // bits 3:1
+#define TX_FULL 0x0
 
 // SPI CMD
 #define R_REGISTER          0x00

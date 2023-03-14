@@ -1,7 +1,10 @@
-#ifndef PRINT_BIN
-#define PRINT_BIN
 
-void print_bin(uint8_t bits) {
+#ifndef PRINTBIN_H
+#define PRINTBIN_H
+
+#include "NRF24_config.h"
+
+void printBin(uint8_t bits) {
   char bin_str [8] = {};
 
   for (int i = 0; i < 8; i++) {

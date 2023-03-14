@@ -1,22 +1,22 @@
 
-// Define the header file only once
 #ifndef NRF24_H
 #define NRF24_H
 
-#include <stdint.h>
-#include "NRF24_defines.h"
+#include "NRF24_config.h"
 
 class NRF24
 {
 
 private:
-  uint8_t ce_pin;    /** Chip Enable pin. Used to select RX/TX mode*/
-  uint8_t csn_pin;   /** SPI bus Chip Select pin */
-  uint8_t irq_pin;  /** Active LOW IRQ pin*/
+  uint8_t ce_pin;         /* Chip Enable pin. Used to select RX/TX mode */
+  uint8_t csn_pin;        /* SPI bus Chip Select pin */
+  uint8_t irq_pin;        /* Active LOW IRQ pin */
+  uint8_t config_reg;     /* NRF_CONFIG register value */
+  uint8_t payload_size;
 
-  /** WLAN channel constants for setting RF channel */
-  const uint8_t wlan_ch[14] = {
-    0, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72
+  /* WLAN channel constants for setting RF channel */
+  const uint8_t WLAN_CH[13] = {
+    12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72
   };
 
 public:
@@ -29,11 +29,10 @@ public:
   NRF24(uint8_t ce_pin, uint8_t csn_pin, uint8_t irq_pin);
 
   /**
-   * Initialize SPI bus, ce pin and csn pin
-   * @return - 'true' Initializing is complete
-   * @return - 'false' Initializing in progress
+   * Initializes SPI, MCU pins and NRF.
+   * Call this method before doing anything related to NRF!
    */
-  bool init();
+  void init(void);
 
   /**
    * Begin SPI transaction.
@@ -61,65 +60,78 @@ public:
   void set_ce(uint8_t level);
 
   /**
-   * Read register
+   * Read register value and return it
    * @param reg_addr Register map address
-   * @return uint8_t Register value
+   * @return Register value
    */
   uint8_t read_reg(uint8_t reg_addr);
 
   /**
-   * Read register
+   * Read register and write value to pointer destination
    * @param reg_addr Register map address
-   * @param buf Pointer to buffer to store read data
-   * @return uint8_t STATUS register value
+   * @param buf Pointer to buffer to store data
    */
-  uint8_t read_reg(uint8_t reg_addr, uint8_t* buf);
+  void read_reg(uint8_t reg_addr, uint8_t* buf);
 
   /**
-   * Read status register
-   * @return Status register value
+   * Get STATUS register value
+   * @return STATUS register value
    */
-  void read_status(uint8_t* buf);
+  uint8_t read_status(void);
+
+  /**
+   * Read irq values from STATUS register
+   * @param _MAX_RT Address to write irq status of 'MAX_RT'
+   * @param _TX_DS Address to write irq status of 'TX_DS'
+   * @param _RX_DR Address to write irq status of 'RX_DR'
+   */
+  void read_irqs(bool* _MAX_RT, bool* _TX_DS, bool* _RX_DR);
 
   /**
    * Write to register
-   * @param reg_addr Register address
+   * @param reg_addr Which register to write
    * @param val Value to write
    */
   void write_reg(uint8_t reg_addr, uint8_t val);
 
   /**
-   * Write bit of STATUS register to '1' or '0'
-   * @param bit Which bit (0-7) to manipulate
-   * @param value Bit value '1' or '0' 
+   * Write arbitary number of bytes to register
+   * @param reg_addr Which register to write
+   * @param buf Buffer address where to read data to be written
+   * @param len Number of bytes to write
    */
-  void write_status_bit(uint8_t bit, uint8_t val);
+  void write_reg(uint8_t reg_addr, uint8_t* buf, uint8_t bytes);
 
   /**
-   * Write bit of register to '1' or '0'
-   * @param reg_addr Register map address
-   * @param bit Which bit (0-7) to manipulate
-   * @param val Bit value '1' or '0'
+   * Set power amplifier level
+   * @param pa_level See 'NRF24_defines.h' for valid values
    */
-  void write_reg_bit(uint8_t reg_addr, uint8_t bit, uint8_t val);
+  void set_PA_level(uint8_t pa_level);
 
   /**
-   * Set SETUP_RERT register value
+   * Set payload size for all data pipes
+   * @param _payload_size Number of bytes in each payload
+   */
+  void set_payload_size(uint8_t _payload_size);
+
+  /**
+   * Set RF datarate.
+   * @note Only modifies RF_DR_HIGH bit thus valid modes are 1Mbps or 2Mbps 
+   * @param data_rate See 'NRF24_defines.h' for valid values
+   */
+  void set_data_rate(uint8_t data_rate);
+  
+  /**
+   * Set SETUP_RETR register value
    * @param ARD Auto Retransmit Delay, set in 250us intervals.
    *            E.g. '0000' - 250us, '1111' - 1000us
    * @param ARC Auto Retransmit Count.
-   *            Number of retransmit if ACK not received.
+   *            Number of retransmit if ACK not received, valid values 0-15.
    */
   void set_setup_retr(uint8_t ARD, uint8_t ARC);
 
   /**
-   * Set RF channel frequency, 2400 + channel (MHz)
-   * @param channel RF channel between 0-127
-   */
-  void set_channel(uint8_t channel);
-
-  /**
-   * Set RF channel frequency with WLAN channel number
+   * Set RF channel frequency to match WLAN channel frequency
    * @param wlan_channel WLAN channel number (1-13)
    */
   void set_wlan_channel(uint8_t wlan_channel);
@@ -131,35 +143,34 @@ public:
   void set_power_on(void);
 
   /**
-   * Set NRF to TX mode.
-   * Sets CE pin to HIGH
+   * Move NRF to RX state 
+   */
+  void start_receiving(void);
+
+  /**
+   * Write payload to TX FIFO
+   * @param payload Payload address
+   */
+  void write_tx_payload(void* payload);
+
+  /**
+   * Pulse CE HIGH to transmit one payload from TX FIFO
    */
   void transmit(void);
 
   /**
-   * Write payload to TX FIFO
-   * @param payload Payload to TX FIFO
-   * @return - 'true' Write to TX FIFO successful.
-   * @return - 'false' TX FIFO full
+   * Read RX FIFO payload to buffer
+   * @param buffer Buffer address
    */
-  bool write_tx_payload(uint8_t payload);
-
+  void read_rx_payload(void* buf);
+ 
   /**
-   * Read OBSERVE_TX register.
-   * Bits 7:4 contain lost packet count.
-   * Bits 3:0 contain retransmitted packet count.
-   * @return uint8_t register value
-   */
-  uint8_t read_observe_tx(uint8_t* buf);
-  
-
-  /**
-   * Flush TX FIFO when in PTX mode
+   * Flush TX FIFO
    */
   void flush_tx();
 
   /**
-   * Flush RX FIFO when in PRX mode
+   * Flush RX FIFO
    */
   void flush_rx();
 
@@ -167,6 +178,20 @@ public:
    * Clear all 3 IRQs on STATUS register
    */
   void clear_irqs();
+
+  /**
+   * Read OBSERVE_TX register value to given addresses.
+   * PLOS_CNT = packets lost since channel change.
+   * ARC_CNT = retransmits of the same packet
+   * @param plos_cnt_buf Address to store packet lost count value
+   * @param arc_cnt_buf Address to store auto retransmit count value
+   */
+  void read_observe_tx(uint8_t* plos_cnt_buf, uint8_t* arc_cnt_buf);
+
+  /**
+   * Prints nrf's register values to console in pretty format
+   */
+  void print_reg();
 
 };
 #endif // NRF24_H
