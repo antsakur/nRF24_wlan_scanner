@@ -6,6 +6,8 @@ The amount of lost packets gives good indication of the channel quality and if t
 
 Upload PTX example sketch to one device and PRX example to another.
 
+**Library has support only for AVR boards.**
+
 This library was done as part of my bachelor's thesis work.
 
 # Installing library
