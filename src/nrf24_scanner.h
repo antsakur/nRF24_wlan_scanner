@@ -1,4 +1,6 @@
-
+/*
+  nrf24_scanner.h - Library for nrf24 wlan scanner
+*/
 #ifndef NRF24_SCANNER_H
 #define NRF24_SCANNER_H
 

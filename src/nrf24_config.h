@@ -1,4 +1,3 @@
-
 #ifndef NRF24_CONFIG_H
 #define NRF24_CONFIG_H
 

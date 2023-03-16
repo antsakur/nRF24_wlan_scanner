@@ -1,3 +1,6 @@
+/*
+  nrf24_scanner.cpp - Library for nrf24 wlan scanner
+*/
 
 #include "nrf24_scanner.h"
 #include "nrf24_config.h"

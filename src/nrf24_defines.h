@@ -1,10 +1,9 @@
+/*
+   nrf24_defines.h - nrf24 wlan scanner defines and bit mnemonics
+ */
 
 #ifndef NRF24_DEFINES_H
 #define NRF24_DEFINES_H
-
-/**
- * This file contains defines e.g. register map address and platform spesific configurations
- */
 
 #define NRF_SPI_SCK_F 10000000 // 10 MHz
 
@@ -67,7 +66,7 @@
 #define RX_DR   0x6
 #define TX_DS   0x5
 #define MAX_RT  0x4
-#define RX_P_NO 0x1 // bits 3:1
+#define RX_P_NO 0x1 // bits [3:1]
 #define TX_FULL 0x0
 
 // SPI CMD
@@ -82,6 +81,5 @@
 #define W_ACK_PAYLOAD       0xA8
 #define W_TX_PAYLOAD_NO_ACK 0xB0
 #define NOP                 0xFF
-#define REG_MASK            0x1F // Register mask for write and read commands (xxxA AAAA)
 
 #endif // NRF24_DEFINES_H
