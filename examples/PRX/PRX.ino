@@ -2,7 +2,7 @@
 /** Receiver of the nRF24L01+ 2.4GHz wlan channel scanner.
  */
 
-#include "NRF24.h"
+#include "nrf24_scanner.h"
 
 // If 1, write info to the serial output
 #define VERBOSE 0
