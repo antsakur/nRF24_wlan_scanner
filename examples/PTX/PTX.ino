@@ -68,6 +68,9 @@ void setup() {
     // Wait for serial to start
   }
 
+  // Call ISR when IRQ is asserted
+  attachInterrupt(digitalPinToInterrupt(IRQ_PIN), irqHandler, FALLING);
+
   nrf.init();
   nrf.mask_irq(0, 0, 1);                  // Mask RX_DR irq
   nrf.set_setup_retr(0x02, 0x0F);         // 750us ARD, 15 ARC
@@ -76,14 +79,10 @@ void setup() {
   nrf.set_payload_size(sizeof(payload));
   nrf.set_wlan_channel(wlan_ch);          // Set RF freq to wlan channel 1
 
-  // Call ISR when IRQ is asserted
-  attachInterrupt(digitalPinToInterrupt(IRQ_PIN), irqHandler, FALLING);
-
   nrf.print_reg();  // Print values of nrf registers
 
   nrf.write_tx_payload(payload);  // Write payload to TX FIFO
   nrf.transmit();                 // Send it
-
 } // setup
 
 void loop() {
