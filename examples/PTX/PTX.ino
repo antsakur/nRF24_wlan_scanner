@@ -1,7 +1,7 @@
 
 /** Transmitter of the nRF24L01+ 2.4GHz wlan channel scanner.
  *  Writes wlan channel information to the serial output.
- *  PRX device must be active along side this PRX device for things to work.
+ *  PRX device must be active alongside the PRX device for things to work.
  */
  
 #include "nrf24_scanner.h"
