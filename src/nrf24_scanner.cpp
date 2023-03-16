@@ -1,7 +1,7 @@
 
-#include "NRF24.h"
-#include "NRF24_config.h"
-#include "printBin.h"
+#include "nrf24_scanner.h"
+#include "nrf24_config.h"
+#include "printbin.h"
 
 NRF24::NRF24(uint8_t _ce_pin, uint8_t _csn_pin, uint8_t _irq_pin):
     ce_pin(_ce_pin), csn_pin(_csn_pin), irq_pin(_irq_pin)
@@ -43,14 +43,14 @@ inline void NRF24::end_transaction(void)
     SPI.endTransaction();
 }
 
-void NRF24::set_ce(uint8_t level)
+void NRF24::set_ce(bool state)
 {
-    digitalWrite(ce_pin, level);
+    digitalWrite(ce_pin, state);
 }
 
-void NRF24::set_csn(uint8_t level)
+void NRF24::set_csn(bool state)
 {
-    digitalWrite(csn_pin, level);
+    digitalWrite(csn_pin, state);
 }
 
 uint8_t NRF24::read_reg(uint8_t reg_addr)
@@ -78,6 +78,15 @@ uint8_t NRF24::read_status(void)
     end_transaction();
 
     return status;
+}
+
+void NRF24::mask_irq(bool rt, bool tx, bool rx)
+{   
+    // Clear bits
+    NRF24::config_reg = static_cast<uint8_t>(NRF24::config_reg & ~(1 << MASK_MAX_RT | 1 << MASK_TX_DS | 1 << MASK_RX_DR));
+    // Set bits
+    NRF24::config_reg = static_cast<uint8_t>(NRF24::config_reg | rt << MASK_MAX_RT |  tx << MASK_TX_DS | rx << MASK_RX_DR);
+    write_reg(NRF_CONFIG, NRF24::config_reg);
 }
 
 void NRF24::read_irqs(bool* _max_rt, bool* _tx_ds, bool* _rx_dr)

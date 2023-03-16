@@ -1,6 +1,6 @@
 
-#ifndef NRF24_H
-#define NRF24_H
+#ifndef NRF24_SCANNER_H
+#define NRF24_SCANNER_H
 
 #include "NRF24_config.h"
 
@@ -8,7 +8,7 @@ class NRF24
 {
 
 private:
-  uint8_t ce_pin;         /* Chip Enable pin. Used to select RX/TX mode */
+  uint8_t ce_pin;         /* Chip Enable pin */
   uint8_t csn_pin;        /* SPI bus Chip Select pin */
   uint8_t irq_pin;        /* Active LOW IRQ pin */
   uint8_t config_reg;     /* NRF_CONFIG register value */
@@ -18,6 +18,23 @@ private:
   const uint8_t WLAN_CH[13] = {
     12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72
   };
+
+  /**
+   * Set SPI bus Chip Select (CSN).
+   * Active LOW
+   * @param state HIGH or LOW
+   */
+  void set_csn(bool state);
+
+  /**
+   * Begin SPI transaction and toggle CSN pin LOW
+   */
+  inline void begin_transaction();
+
+  /**
+   * End SPI transaction and toggle CSN pin HIGH
+   */
+  inline void end_transaction();
 
 public:
   /**
@@ -35,29 +52,11 @@ public:
   void init(void);
 
   /**
-   * Begin SPI transaction.
-   * Includes CSN pin toggle LOW
+   * Set chip enable.
+   * HIGH state enables RX/TX mode
+   * @param state HIGH or LOW
    */
-  inline void begin_transaction();
-
-  /**
-   * End SPI transaction.
-   * Includes CSN pin toggle HIGH
-   */
-  inline void end_transaction();
-
-  /**
-   * Set SPI bus Chip Select (CSN).
-   * Active LOW
-   * @param level HIGH or LOW
-   */
-  void set_csn(uint8_t level);
-
-  /**
-   * Set Chip Select pin
-   * @param level HIGH or LOW
-   */
-  void set_ce(uint8_t level);
+  void set_ce(bool state);
 
   /**
    * Read register value and return it
@@ -78,6 +77,15 @@ public:
    * @return STATUS register value
    */
   uint8_t read_status(void);
+
+  /**
+   * Mask interrupts.
+   * Masked interrupts are not reflected on IRQ pin
+   * @param _MAX_RT '1' to mask, '0' to unmask max_rt irq
+   * @param _TX_DS '1' to mask, '0' to unmask tx_ds irq
+   * @param _RX_DR '1' to mask, '0' to unmask rx_dr irq
+   */
+  void mask_irq(bool _MAX_RT, bool _TX_DS, bool _RX_DR);
 
   /**
    * Read irq values from STATUS register
@@ -159,7 +167,8 @@ public:
   void transmit(void);
 
   /**
-   * Read RX FIFO payload to buffer
+   * Read RX FIFO payload to buffer.
+   * @note Also resets all irqs
    * @param buffer Buffer address
    */
   void read_rx_payload(void* buf);
@@ -194,4 +203,4 @@ public:
   void print_reg();
 
 };
-#endif // NRF24_H
+#endif // NRF24_SCANNER_H
