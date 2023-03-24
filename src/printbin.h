@@ -1,3 +1,6 @@
+/*
+  printbin.h - Print 8-bit value in binary MSb to LSb
+*/
 
 #ifndef PRINTBIN_H
 #define PRINTBIN_H
