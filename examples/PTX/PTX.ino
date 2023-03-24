@@ -68,7 +68,7 @@ void setup() {
 
   nrf.init();
   nrf.mask_irq(0, 0, 1);                  // Mask RX_DR irq
-  nrf.set_setup_retr(0x02, 0x0F);         // 750us ARD, 15 ARC
+  nrf.set_setup_retr(0x01, 0x0F);         // 500us ARD, 15 ARC
   nrf.set_PA_level(PA_LOW);               // -18dBm
   nrf.set_data_rate(DATARATE_MED);        // 1Mbps
   nrf.set_payload_size(sizeof(payload));  // Set correct payload size
