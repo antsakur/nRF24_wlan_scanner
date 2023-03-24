@@ -153,8 +153,7 @@ void hopChannel() {
   tmp_sample = 0;
   payload = 1;
   nrf.set_wlan_channel(wlan_ch == WLAN_CHANNELS ? wlan_ch = 1 : ++wlan_ch);
-  if (wlan_ch == 1) 
-  {
+  if (wlan_ch == 1) {
     calcAvg();
   }
 
